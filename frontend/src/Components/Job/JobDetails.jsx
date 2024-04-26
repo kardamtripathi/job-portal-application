@@ -17,9 +17,11 @@ const JobDetails = () => {
       navigate('/notfound')
     })
   }, []) 
-  if(!isAuthorized){
-    navigate('/login')
-  }
+  useEffect(() => {
+    if(!isAuthorized){
+      navigate('/login')
+    }
+  }, [isAuthorized])
   return (
     <section className='jobDetail page'>
       <div className="container">
