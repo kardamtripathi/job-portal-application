@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Context } from "../../main";
 import { BACKEND_URL } from "../../BackendUrl";
@@ -47,9 +47,11 @@ const OtherJobs = () => {
     closeModel();
   };
 
-  if (!isAuthorized) {
-    navigate("/login");
-  }
+  useEffect(() => {
+    if (!isAuthorized) {
+      navigate("/login");
+    }
+  }, [isAuthorized])
 
   return (
     <>
