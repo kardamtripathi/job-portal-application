@@ -18,9 +18,11 @@ const Jobs = () => {
       console.log(error)
     }
   }, []);
-  if(!isAuthorized){
-    navigate('/login');
-  }
+  useEffect(() => {
+    if(!isAuthorized){
+      navigate("/login")
+    }
+  }, [isAuthorized])
   return (
     <section className='jobs page'>
       <div className="container">
