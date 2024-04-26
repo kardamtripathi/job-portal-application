@@ -24,9 +24,19 @@ const MyJobs = () => {
     };
     fetchJobs();
   }, [])
-  if(!isAuthorized || (user && user.role !== "Employer")){
-    navigate('/');
-  }
+  // if(!isAuthorized || (user && user.role !== "Employer")){
+  //   navigate('/');
+  // }
+  useEffect(() => {
+    if(!isAuthorized){
+      navigate("/")
+    }
+  }, [isAuthorized])
+  useEffect(() => {
+    if(user && user.role !== "Employer"){
+      navigate('/login')
+    }
+  }, [user])
   const handleEnableEdit = (jobId) => {
     setEditingMode(jobId);
   }
