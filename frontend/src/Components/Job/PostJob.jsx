@@ -47,9 +47,16 @@ const PostJob = () => {
     })
   }
   const navigate = useNavigate();
-  if(!isAuthorized || (user && user.role !== "Employer")){
-    navigate("/")
-  }
+  useEffect(() => {
+    if(!isAuthorized){
+      navigate("/")
+    }
+  }, [isAuthorized])
+  useEffect(() => {
+    if(user && user.role !== "Employer"){
+      navigate('/login')
+    }
+  }, [user])
   return (
     <>
       <div className="job_post page">
