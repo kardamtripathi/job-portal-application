@@ -30,9 +30,11 @@ const MyApplications = () => {
       toast.error(error.response.data.message);
     }
   }, [isAuthorized])
-  if(!isAuthorized){
-    navigate('/')
-  }
+  useEffect(() => {
+    if(!isAuthorized){
+      navigate('/')
+    }
+  }, [isAuthorized])
   const deleteApplication = (id) => {
     try{
       axios.delete(`${BACKEND_URL}/api/application/delete/${id}`, {withCredentials: true})
