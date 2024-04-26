@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react'
+import React, {useState, useContext, useEffect} from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import {useNavigate, useParams} from 'react-router-dom'
@@ -47,9 +47,16 @@ const Application = () => {
       toast.error(error.response.data.message);
     }
   }
-  if(!isAuthorized || (user && user.role !== "Job Seeker")){
-    navigate('/');
-  }
+  useEffect(() => {
+    if(!isAuthorized){
+      navigate('/')
+    }
+  }, [isAuthorized])
+  useEffect(() => {
+    if(user && user.role !== "Job Seeker"){
+      navigate('/')
+    }
+  }, [user])
   return (
     <section className='application'>
       <div className="container">
