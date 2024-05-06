@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import {useNavigate, useParams} from 'react-router-dom'
 import {Context} from '../../main'
 import { BACKEND_URL } from '../../BackendUrl';
+import { CircularProgress } from '@mui/material'
 const Application = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -11,6 +12,7 @@ const Application = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [resume, setResume] = useState(null);
+  const [loading, setLoading] = useState(false);
   const {isAuthorized, user} = useContext(Context)
   const navigate = useNavigate();
   const handleFileChange = (e) => {
@@ -20,6 +22,7 @@ const Application = () => {
   const {id} = useParams();
   const handleApplication = async(e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData();
     formData.append("name", name);
     formData.append("email", email);
@@ -41,10 +44,12 @@ const Application = () => {
       setResume("");
       setAddress("");
       toast.success(data.message);
+      setLoading(false);
       navigate('/job/getAll');
     }
     catch(error){
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -71,7 +76,13 @@ const Application = () => {
             <label style={{textAlign: 'start', display: 'block', fontSize:'20px'}}>Select Resume</label>
             <input type='file' accept='.jpg, .jpeg, .png, .webp' onChange={handleFileChange} style={{width: "100%"}} />
           </div>
-          <button type='submit'>Submit Application</button>
+          {
+            loading ? 
+            <div className='loaderContainer'>
+              <CircularProgress style={{color: "#0096c7"}} />
+            </div>
+            : <button type='submit'>Submit Application</button>
+          }
         </form>
       </div>
     </section>
