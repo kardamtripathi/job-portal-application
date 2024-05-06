@@ -7,12 +7,15 @@ import Logo from "../../assets/logo.png";
 import { MdOutlineMailOutline } from "react-icons/md";
 import LoginImg from "../../assets/login.png";
 import { BACKEND_URL } from "../../BackendUrl";
+import { CircularProgress } from "@mui/material";
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.post(
         `${BACKEND_URL}/api/user/forgotPassword`,
         { email },
@@ -27,17 +30,22 @@ const ForgotPassword = () => {
       if (response) {
         // console.log(response);
         if (response.data.Status === "Success") {
-            toast.success(response.data.message);
-            navigate('/login')
+          toast.success(response.data.message);
+          setLoading(false);
+          navigate("/login");
         }
       } else {
         toast.error(response.message);
+        setLoading(true);
       }
       setEmail("");
       setPassword("");
       setRole("");
     } catch (error) {
-      toast.error(error.response.data.message || "An error occurred while logging in");
+      toast.error(
+        error.response.data.message || "An error occurred while logging in"
+      );
+      setLoading(false);
     }
   };
   return (
@@ -61,9 +69,15 @@ const ForgotPassword = () => {
                 />
               </div>
             </div>
-            <button onClick={handleSubmit} type="submit">
-              Submit
-            </button>
+            {loading ? (
+              <div className="loaderContainer">
+                <CircularProgress />
+              </div>
+            ) : (
+              <button onClick={handleSubmit} type="submit">
+                Submit
+              </button>
+            )}
           </form>
         </div>
         <div className="banner">
