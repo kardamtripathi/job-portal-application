@@ -5,14 +5,17 @@ import toast from 'react-hot-toast'
 import {useNavigate} from 'react-router-dom'
 import ResumeModel from './ResumeModal'
 import { BACKEND_URL } from '../../BackendUrl';
+import { CircularProgress } from '@mui/material'
 const MyApplications = () => {
   const [applications, setApplications] = useState([]);
   const [modelOpen, setModelOpen] = useState(false);
   const [resumeImageUrl, setResumeImageUrl] = useState("");
   const {isAuthorized, user} = useContext(Context);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     try{
+      setLoading(true);
       if(user && user.role === "Employer"){
         axios.get(`${BACKEND_URL}/api/application/employer/getAllApplications`, {withCredentials: true})
         .then((res) => {
@@ -25,9 +28,11 @@ const MyApplications = () => {
           setApplications(res.data.applications);
         })
       }
+      setLoading(false);
     }
     catch(error){
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   }, [isAuthorized])
   useEffect(() => {
@@ -37,14 +42,17 @@ const MyApplications = () => {
   }, [isAuthorized])
   const deleteApplication = (id) => {
     try{
+      setLoading(true);
       axios.delete(`${BACKEND_URL}/api/application/delete/${id}`, {withCredentials: true})
       .then((res) => {
         toast.success(res.data.message);
         setApplications((prevApplication) => prevApplication.filter((application) => application._id !== id))
       })
+      setLoading(false);
     }
     catch(error){
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   }
   const openModel = (imageUrl) => {
@@ -59,6 +67,9 @@ const MyApplications = () => {
       {user && user.role === "Job Seeker" ? (
         <div className="container">
           <h1>My Applications</h1>
+          {
+            loading ? <CircularProgress style={{color: "#0096c7"}} /> : <></>
+          }
           {
             applications.length <= 0 ? (
               <>{" "} 
@@ -76,6 +87,9 @@ const MyApplications = () => {
       ) : (
         <div className="container">
           <h1>Applications from Job Seekers</h1>
+          {
+            loading ? <CircularProgress style={{color: "#0096c7"}} /> : <></>
+          }
           {
             applications.length <= 0 ? (
               <>{" "} 
