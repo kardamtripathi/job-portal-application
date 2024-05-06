@@ -5,6 +5,7 @@ import { BACKEND_URL } from "../../BackendUrl";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import OtherJobDetails from "./OtherJobDetails";
+import { CircularProgress } from "@mui/material";
 
 const OtherJobs = () => {
   const [jobRole, setJobRole] = useState("");
@@ -13,12 +14,14 @@ const OtherJobs = () => {
   const [show, setShow] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [modelOpen, setModelOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { isAuthorized } = useContext(Context);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.get(
         `${BACKEND_URL}/api/otherJobs/jobs?jobRole=${jobRole}&location=${location}`,
         { withCredentials: true }
@@ -26,10 +29,12 @@ const OtherJobs = () => {
       setJobs(response.data.jobs);
       setShow(true);
       toast.success(response.data.message);
+      setLoading(false);
     } catch (error) {
       console.log(error);
       setShow(false);
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   };
 
@@ -51,7 +56,7 @@ const OtherJobs = () => {
     if (!isAuthorized) {
       navigate("/login");
     }
-  }, [isAuthorized])
+  }, [isAuthorized]);
 
   return (
     <>
@@ -81,8 +86,12 @@ const OtherJobs = () => {
                 />
               </div>
             </div>
-            <button type="submit">Search Jobs</button>
+          {loading ? 
+          <div className="loaderContainer"> 
+          <CircularProgress style={{color: "#0096c7"}} /> </div> 
+          :<button type="submit">Search Jobs</button>}
           </form>
+
         </div>
       </section>
       {show ? (
@@ -97,7 +106,11 @@ const OtherJobs = () => {
                     <p>{element.company}</p>
                     <p>{element.location}</p>
                     <div>
-                      <button id="otherJobsBtn" onClick={() => handleButton(element)} style={{"padding": "10px"}}>
+                      <button
+                        id="otherJobsBtn"
+                        onClick={() => handleButton(element)}
+                        style={{ padding: "10px" }}
+                      >
                         More
                       </button>
                     </div>
