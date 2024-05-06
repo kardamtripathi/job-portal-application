@@ -10,6 +10,7 @@ import { FaPhoneFlip } from "react-icons/fa6";
 import { RiLock2Fill } from "react-icons/ri";
 import RegisterImg from "../../assets/register.png";
 import { BACKEND_URL } from "../../BackendUrl";
+import { CircularProgress } from "@mui/material";
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,10 +21,12 @@ const Register = () => {
   const [userId, setUserId] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState("");
   const [showOtp, setShowOtp] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { isAuthorized, setIsAuthorized, user, setUser } = useContext(Context);
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await axios.post(
         `${BACKEND_URL}/api/user/register`,
         { name, email, phone, password, role },
@@ -38,6 +41,7 @@ const Register = () => {
       setUserId(data.data.userId);
       setRegisteredEmail(data.data.email);
       setShowOtp(true);
+      setLoading(false);
       setName("");
       setEmail("");
       setPassword("");
@@ -46,12 +50,14 @@ const Register = () => {
       // setIsAuthorized(true);
     } catch (error) {
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   };
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      const {data} = await axios.post(
+      setLoading(true);
+      const { data } = await axios.post(
         `${BACKEND_URL}/api/user/verifyOTP`,
         { userId, otp },
         {
@@ -63,14 +69,17 @@ const Register = () => {
       );
       toast.success(data.message);
       setIsAuthorized(true);
+      setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   };
   const resendOTP = async (e) => {
     e.preventDefault();
     try {
-      const {data} = await axios.post(
+      setLoading(true);
+      const { data } = await axios.post(
         `${BACKEND_URL}/api/user/resendOTP`,
         { userId, email: registeredEmail },
         {
@@ -81,8 +90,10 @@ const Register = () => {
         }
       );
       toast.success(data.message);
+      setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   };
   if (isAuthorized) {
@@ -161,39 +172,56 @@ const Register = () => {
                     />
                   </div>
                 </div>
-                <button onClick={handleRegister} type="submit">
-                  Register
-                </button>
+                {loading ? (
+                  <div className="loaderContainer">
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <button onClick={handleRegister} type="submit">
+                    Register
+                  </button>
+                )}
                 <Link to={"/login"}>Login</Link>
               </form>
             </>
           ) : (
-            <form>
-              <div className="inputTag">
-                <label>Enter OTP</label>
-                <div>
-                  <MdOutlineMailOutline />
-                  <input
-                    type="text"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    placeholder="Enter Your OTP"
-                  />
-                </div>
+            <>
+              <form>
+                <div className="inputTag">
+                  <label>Enter OTP</label>
+                  <div>
+                    <MdOutlineMailOutline />
+                    <input
+                      type="text"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="Enter Your OTP"
+                    />
+                  </div>
                   <p>
                     <i>
                       Note: The OTP sent to your Email Id is only valid for{" "}
                       <b>5</b> minutes
                     </i>
                   </p>
-                <button onClick={handleOTP} type="submit">
-                  Verify
-                </button>
-                <button onClick={resendOTP} type="submit">
-                  Resend OTP
-                </button>
-              </div>
-            </form>
+                  </div>
+                  {
+                    loading ? 
+                    <div className="loaderContainer">
+                      <CircularProgress />
+                    </div>
+                    : 
+                    <>
+                      <button onClick={handleOTP} type="submit">
+                        Verify
+                      </button>
+                      <button onClick={resendOTP} type="submit">
+                        Resend OTP
+                      </button>
+                    </>
+                  }
+              </form>
+            </>
           )}
         </div>
         <div className="banner">
