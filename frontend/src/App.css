@@ -1618,3 +1618,8 @@ nav .hamburger {
     text-decoration: none;
   }
 }
+.loaderContainer{
+  display: flex; 
+  justify-content: center;
+  margin: 10px;
+}
