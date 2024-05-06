@@ -7,20 +7,25 @@ import axios from 'axios';
 import {GiHamburgerMenu} from 'react-icons/gi'
 import '../../App.css'
 import { BACKEND_URL } from '../../BackendUrl'
+import CircularProgress from '@mui/material/CircularProgress';
 const Navbar = () => {
   const [show, setShow] = useState(false);
   const {isAuthorized, setIsAuthorized, user} = useContext(Context);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const handleLogout = async() => {
     try{
+      setLoading(true);
       const response = await axios.get(`${BACKEND_URL}/api/user/logout`, {withCredentials: true});
       toast.success(response.data.message);
       setIsAuthorized(false);
+      setLoading(false);
       navigate('/login');
     }
     catch(error){
       toast.error(error.response.data.message);
-      setIsAuthorized(true)
+      setIsAuthorized(true);
+      setLoading(true);
     }
   }
   return (
@@ -61,7 +66,7 @@ const Navbar = () => {
               <li>
                 <Link to={'/otherJobs'} onClick={() => setShow(false)}>Other Jobs</Link>
               </li>
-              <button onClick={handleLogout}>Logout</button>
+              {loading ? <CircularProgress style={{color: "#0096c7"}} /> : <button onClick={handleLogout}>Logout</button>}
             </ul>
             <div className='hamburger'>
               <GiHamburgerMenu onClick={() => setShow(!show)} />
