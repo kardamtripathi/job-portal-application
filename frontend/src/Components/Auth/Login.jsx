@@ -9,6 +9,7 @@ import { MdOutlineMailOutline } from "react-icons/md";
 import { RiLock2Fill } from "react-icons/ri";
 import LoginImg from "../../assets/login.png";
 import { BACKEND_URL } from "../../BackendUrl";
+import { CircularProgress } from "@mui/material";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,12 +18,13 @@ const Login = () => {
   const [otp, setOtp] = useState("");
   const [userId, setUserId] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState("");
-  const [showOtp, setShowOtp] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { isAuthorized, setIsAuthorized, user, setUser } = useContext(Context);
   const navigate = useNavigate();
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.post(
         `${BACKEND_URL}/api/user/login`,
         { email, password, role },
@@ -44,20 +46,24 @@ const Login = () => {
           setIsAuthorized(true);
         }
         toast.success(response.data.message);
+        setLoading(false);
       }
       else {
         toast.error("Unexpected response from server");
+        setLoading(false);
       }
       setEmail("");
       setPassword("");
       setRole("");
     } catch (error) {
       toast.error(error.response.data.message || "An error occurred while logging in");
+      setLoading(false);
     }
   };
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await axios.post(
         `${BACKEND_URL}/api/user/verifyOTP`,
         { userId, otp },
@@ -70,14 +76,17 @@ const Login = () => {
       );
       toast.success(data.message);
       setIsAuthorized(true);
+      setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   };
 
   const resendOTP = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const { data } = await axios.post(
         `${BACKEND_URL}/api/user/resendOTP`,
         { userId, email: registeredEmail },
@@ -89,8 +98,10 @@ const Login = () => {
         }
       );
       toast.success(data.message);
+      setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
+      setLoading(false);
     }
   };
   if (isAuthorized) {
@@ -146,9 +157,15 @@ const Login = () => {
                   </div>
                 <Link to={"/forgotPassword"} id="forgotPassword">Forgot Password?</Link>
                 </div>
-                <button onClick={handleLogin} type="submit">
-                  Login
-                </button>
+                {
+                  loading ? <div className="loaderContainer">
+                    <CircularProgress />
+                  </div> 
+                  : 
+                  <button onClick={handleLogin} type="submit">
+                    Login
+                  </button>
+                }
                 <Link to={"/register"}>Register</Link>
               </form>
             </div>
@@ -183,13 +200,22 @@ const Login = () => {
                       <b>5</b> minutes
                     </i>
                   </p>
-                  <button onClick={handleOTP} type="submit">
-                    Verify
-                  </button>
-                  <button onClick={resendOTP} type="submit">
-                    Resend OTP
-                  </button>
-                </div>
+                  </div>
+                  {
+                    loading ? 
+                    <div className="loaderContainer">
+                      <CircularProgress />
+                    </div>
+                    : 
+                    <>
+                      <button onClick={handleOTP} type="submit">
+                        Verify
+                      </button>
+                      <button onClick={resendOTP} type="submit">
+                        Resend OTP
+                      </button>
+                    </>
+                  }
               </form>
             </div>
             <div className="banner">
