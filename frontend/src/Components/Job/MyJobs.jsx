@@ -6,27 +6,29 @@ import {RxCross2} from 'react-icons/rx'
 import {Context} from '../../main'
 import {useNavigate} from 'react-router-dom'
 import { BACKEND_URL } from '../../BackendUrl';
+import { CircularProgress } from '@mui/material'
 const MyJobs = () => {
   const [myJobs, setMyJobs] = useState([]);
   const [editingMode, setEditingMode] = useState(null);
   const {isAuthorized, user} = useContext(Context);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchJobs = async() => {
       try{
+        setLoading(true);
         const {data} = await axios.get(`${BACKEND_URL}/api/job/myJobs`, {withCredentials: true})
         setMyJobs(data.myJobs);
+        setLoading(false);
       }
       catch(error){
         toast.error(error.response.data.message)
         setMyJobs([]);
+        setLoading(false);
       }
     };
     fetchJobs();
   }, [])
-  // if(!isAuthorized || (user && user.role !== "Employer")){
-  //   navigate('/');
-  // }
   useEffect(() => {
     if(!isAuthorized){
       navigate("/")
@@ -45,23 +47,29 @@ const MyJobs = () => {
   }
   const handleUpdateJob = async(jobId) => {
     const updatedJob = myJobs.find((job) => job._id === jobId);
+    setLoading(true);
     await axios.put(`${BACKEND_URL}/api/job/update/${jobId}`, updatedJob, {withCredentials: true})
     .then((res) => {
       toast.success(res.data.message);
       setEditingMode(null);
+      setLoading(false);
     })
     .catch((error) => {
       toast.error(error.response.data.message);
+      setLoading(false);
     })
   }
   const handleDeleteJob = async(jobId) => {
+    setLoading(true);
     await axios.delete(`${BACKEND_URL}/api/job/delete/${jobId}`, {withCredentials: true})
     .then((res) => {
       toast.success(res.data.message);
       setMyJobs((prevJobs) => prevJobs.filter((job) => job._id !== jobId))
+      setLoading(false);
     })
     .catch((error) => {
       toast.error(error.response.data.message)
+      setLoading(false);
     })  
   }
   const handleInputChange = (jobId, field, value) => {
@@ -77,6 +85,10 @@ const MyJobs = () => {
         <div className="container">
           <h3>Your Posted Jobs</h3>
           {
+            loading ? <CircularProgress />
+            : <></>
+          }
+          {  
             myJobs && myJobs.length > 0
             ?
             (<>
