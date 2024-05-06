@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import {useNavigate} from 'react-router-dom'
 import {Context} from '../../main'
 import { BACKEND_URL } from '../../BackendUrl';
+import { CircularProgress } from '@mui/material'
 const PostJob = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -16,8 +17,10 @@ const PostJob = () => {
   const [fixedSalary, setFixedSalary] = useState("");
   const [salaryType, setSalaryType] = useState("default");
   const {isAuthorized, user} = useContext(Context);
+  const [loading, setLoading] = useState(false);
   const handleJobPost = async(e) => {
     e.preventDefault();
+    setLoading(true);
     if(salaryType === "Fixed Salary"){
       setSalaryFrom("")
       setSalaryTo("");
@@ -41,9 +44,11 @@ const PostJob = () => {
     }})
     .then((res) => {
       toast.success(res.data.message)
+      setLoading(false);
     })
     .catch((error) => {
       toast.error(error.response.data.message)
+      setLoading(false);
     })
   }
   const navigate = useNavigate();
@@ -62,7 +67,8 @@ const PostJob = () => {
       <div className="job_post page">
         <div className="container">
           <h3>Post a Job</h3>
-          <form onSubmit={handleJobPost}>
+          {
+            <form onSubmit={handleJobPost}>
             <div className="wrapper">
               <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder='Enter Job Title' />
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -106,8 +112,15 @@ const PostJob = () => {
                 </div>
               </div>
               <textarea rows="10" value={description} onChange={(e) => setDescription(e.target.value)} placeholder='Enter Job Description' />
-              <button type='submit'>Add Job</button>
+              {
+                loading ? 
+                <div className='loaderContainer'>
+                  <CircularProgress style={{color: "#0096c7"}} />
+                </div>
+                : <button type='submit'>Add Job</button>
+              }
           </form>
+          }
         </div>
       </div>
     </>
