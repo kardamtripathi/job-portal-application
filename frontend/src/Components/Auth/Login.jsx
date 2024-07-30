@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Context } from "../../main";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -21,6 +21,28 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { isAuthorized, setIsAuthorized, user, setUser } = useContext(Context);
   const navigate = useNavigate();
+  useEffect(() => {
+    const hasShownMessage = localStorage.getItem("hasShownMessage");
+    const timestamp = localStorage.getItem("messageTimestamp");
+    const now = new Date().getTime();
+    const thirtyMinutes = 30 * 60 * 1000;
+
+    if (hasShownMessage && timestamp && now - timestamp < thirtyMinutes) {
+      return;
+    }
+    toast(
+      "If you are visiting after some time, please be patient. The server turns off after 30 minutes of inactivity, so processing your request might take around 40-50 seconds to turn the server back on.",
+      {
+        duration: 15000,
+      }
+    );
+    localStorage.setItem("hasShownMessage", "true");
+    localStorage.setItem("messageTimestamp", now.toString());
+    setTimeout(() => {
+      localStorage.removeItem("hasShownMessage");
+      localStorage.removeItem("messageTimestamp");
+    }, thirtyMinutes);
+  }, []);
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
