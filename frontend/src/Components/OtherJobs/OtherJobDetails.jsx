@@ -24,12 +24,13 @@ const OtherJobDetails = ({ job, onClose }) => {
                 Description: <span>{job.description}</span>
               </p>
               <p>
-                Related Links:{" "}
-                  {job.links.map((link, index) => (
+                {/* Related Links:{" "} */}
+                  {/* {job.share_link.map((link, index) => (
                     <a key={index} href={link.link} target="_blank">
                       {`Link-${index + 1}`}
                     </a>
-                  ))}
+                  ))} */}
+                Related Links: <a href={job.links} target="_blank">Link</a>
               </p>
             </div>
           </div>
